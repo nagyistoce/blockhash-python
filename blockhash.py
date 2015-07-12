@@ -22,11 +22,25 @@ def total_value_rgba(im, data, x, y):
     if a == 0:
         return 765
     else:
-        return r + g + b
+        if colorMode == 1:
+            return r
+        else if colorMode == 2:
+            return g
+        else if colorMode == 3:
+            return b
+        else
+            return r + g + b
 
 def total_value_rgb(im, data, x, y):
     r, g, b = data[y * im.size[0] + x]
-    return r + g + b
+    if colorMode == 1:
+        return r
+    else if colorMode == 2:
+        return g
+    else if colorMode == 3:
+        return b
+    else
+        return r + g + b
 
 def bits_to_hexhash(bits):
     return '{0:0={width}x}'.format(int(''.join([str(x) for x in bits]), 2), width = len(bits) // 4)
