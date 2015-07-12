@@ -24,9 +24,9 @@ def total_value_rgba(im, data, x, y):
     else:
         if colorMode == 1:
             return r
-        else if colorMode == 2:
+        elif colorMode == 2:
             return g
-        else if colorMode == 3:
+        elif colorMode == 3:
             return b
         else
             return r + g + b
@@ -35,9 +35,9 @@ def total_value_rgb(im, data, x, y):
     r, g, b = data[y * im.size[0] + x]
     if colorMode == 1:
         return r
-    else if colorMode == 2:
+    elif colorMode == 2:
         return g
-    else if colorMode == 3:
+    elif colorMode == 3:
         return b
     else
         return r + g + b
