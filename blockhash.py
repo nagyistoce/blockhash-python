@@ -32,7 +32,7 @@ def bits_to_hexhash(bits):
     return '{0:0={width}x}'.format(int(''.join([str(x) for x in bits]), 2), width = len(bits) // 4)
 
 
-def blockhash_even(im, bits):
+def blockhash_even(im, colorMode, bits):
     if im.mode == 'RGBA':
         total_value = total_value_rgba
     elif im.mode == 'RGB':
@@ -74,7 +74,7 @@ def blockhash_even(im, bits):
 
     return bits_to_hexhash(result)
 
-def blockhash(im, bits):
+def blockhash(im, colorMode, bits):
     if im.mode == 'RGBA':
         total_value = total_value_rgba
     elif im.mode == 'RGB':
@@ -202,7 +202,14 @@ if __name__ == '__main__':
             size = (int(size[0]), int(size[1]))
             im = im.resize(size, interpolation)
 
-        hash = method(im, args.bits)
+        # get R hash
+        hash = method(im, 1, args.bits)
+        # get G hash
+        hash = method(im, 2, args.bits)
+        # get B hash
+        hash = method(im, 3, args.bits)
+        # get RGB to grayscale hash
+        hash = method(im, 0, args.bits)
 
         print('{} {}'.format(fn, hash))
 
