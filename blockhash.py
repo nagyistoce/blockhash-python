@@ -17,7 +17,7 @@ def median(data):
         return (data[length // 2] + data[length // 2 + 1]) / 2.0
     return data[length // 2]
 
-def total_value_rgba(im, data, x, y):
+def total_value_rgba(im, colorMode, data, x, y):
     r, g, b, a = data[y * im.size[0] + x]
     if a == 0:
         return 765
@@ -28,10 +28,10 @@ def total_value_rgba(im, data, x, y):
             return g
         elif colorMode == 3:
             return b
-        else
+        else:
             return r + g + b
 
-def total_value_rgb(im, data, x, y):
+def total_value_rgb(im, colorMode, data, x, y):
     r, g, b = data[y * im.size[0] + x]
     if colorMode == 1:
         return r
@@ -39,7 +39,7 @@ def total_value_rgb(im, data, x, y):
         return g
     elif colorMode == 3:
         return b
-    else
+    else:
         return r + g + b
 
 def bits_to_hexhash(bits):
@@ -69,7 +69,7 @@ def blockhash_even(im, colorMode, bits):
                 for ix in range(blocksize_x):
                     cx = x * blocksize_x + ix
                     cy = y * blocksize_y + iy
-                    value += total_value(im, data, cx, cy)
+                    value += total_value(im, colorMode, data, cx, cy)
 
             result.append(value)
 
@@ -103,7 +103,7 @@ def blockhash(im, colorMode, bits):
     even_y = height % bits == 0
 
     if even_x and even_y:
-        return blockhash_even(im, bits)
+        return blockhash_even(im, colorMode, bits)
 
     blocks = [[0 for col in range(bits)] for row in range(bits)]
 
@@ -129,7 +129,7 @@ def blockhash(im, colorMode, bits):
                 block_bottom = int(-(-y // block_height)) # int(math.ceil(float(y) / block_height))
 
         for x in range(width):
-            value = total_value(im, data, x, y)
+            value = total_value(im, colorMode, data, x, y)
 
             if even_x:
                 # don't bother dividing x, if the size evenly divides by bits
@@ -176,11 +176,11 @@ if __name__ == '__main__':
 
     parser.add_argument('--quick', type=bool, default=False,
         help='Use quick hashing method. Default: False')
-    parser.add_argument('--bits', type=int, default=16,
-        help='Create hash of size N^2 bits. Default: 16')
+    parser.add_argument('--bits', type=int, default=32,
+        help='Create hash of size N^2 bits. Default: 32')
     parser.add_argument('--size',
         help='Resize image to specified size before hashing, e.g. 256x256')
-    parser.add_argument('--interpolation', type=int, default=1, choices=[1, 2, 3, 4],
+    parser.add_argument('--interpolation', type=int, default=4, choices=[1, 2, 3, 4],
         help='Interpolation method: 1 - nearest neightbor, 2 - bilinear, 3 - bicubic, 4 - antialias. Default: 1')
     parser.add_argument('--debug', action='store_true',
         help='Print hashes as 2D maps (for debugging)')
@@ -211,21 +211,37 @@ if __name__ == '__main__':
         elif im.mode == 'LA':
             im = im.convert('RGBA')
 
+	# w = im.size[0]
+	# h = im.size[1]
+	# print fn, "is", w, "x", h
+	print im.getextrema()
+	# print im.info
+
+        # print im.histogram()
+
         if args.size:
             size = args.size.split('x')
             size = (int(size[0]), int(size[1]))
             im = im.resize(size, interpolation)
 
-        # get R hash
-        hash = method(im, 1, args.bits)
-        # get G hash
-        hash = method(im, 2, args.bits)
-        # get B hash
-        hash = method(im, 3, args.bits)
+        # get Red hash
+	# args.colorMode = 1
+        hashR = method(im, 1, args.bits)
+        print('{} {}'.format(fn, hashR))
+        # get Green hash
+	# args.colorMode = 2
+        hashG = method(im, 2, args.bits)
+        print('{} {}'.format(fn, hashG))
+        # get Blue hash
+	# args.colorMode = 3
+        hashB = method(im, 3, args.bits)
+        print('{} {}'.format(fn, hashB))
         # get RGB to grayscale hash
+	# args.colorMode = 0
         hash = method(im, 0, args.bits)
 
         print('{} {}'.format(fn, hash))
+
 
         if args.debug:
             bin_hash = bin(int(hash, 16))[2:]
